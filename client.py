@@ -1,4 +1,4 @@
-import sys
+import sys, os, re
 import requests
 
 from argparse import ArgumentParser, Namespace
@@ -22,9 +22,9 @@ def get_data():
     response = requests.get(f"{URL}get_info")
     if response.ok:
         print(f"Response content: {response.text}")
-    else:
-        print(f"Status code: {response.status_code}")
-
+    elif response.status_code == 400:
+        print("Resource not found")
+        
 def main(args: list):
     parsed_args = parser_args(args)
     if parsed_args.insert:
