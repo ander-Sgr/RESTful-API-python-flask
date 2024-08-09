@@ -74,7 +74,7 @@ def delete_data():
    if not value:
       return Response("No data provided", status=400, mimetype="text/plain")
    if not data_exists(value):
-      return Response("The value exsits in the db", status=409, mimetype="text/plain")
+      return Response("The value not exsits in the db", status=409, mimetype="text/plain")
    replace_data(value, "")
    return Response(f"Value {value} deleted from the db", status=200, mimetype="text/plain")
 
@@ -86,7 +86,7 @@ def update_data():
    if not value:
       return Response("No data provided", status=400, mimetype="text/plain")
    if not data_exists(value):
-      return Response("The value exsits in the db", status=409, mimetype="text/plain")
+      return Response("The value not exsits in the db", status=409, mimetype="text/plain")
    replace_data(value, new_value)
    return Response(f"Value {value} updated by {new_value}", status=200, mimetype="text/plain")
 
