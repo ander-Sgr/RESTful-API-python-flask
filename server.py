@@ -2,70 +2,28 @@ from flask import Flask, request, Response
 import csv
 import os
 from typing import List
+from FileUtils import *
 
 app = Flask(__name__)
 CSV_FILE = 'data.csv'
-
-def create_csv_file(file_name: str=CSV_FILE) -> None:
-    if not os.path.isfile(file_name):
-        with open(file_name, mode="w", newline="") as file:
-          csv.writer(file)
-
-
-def write_data(data: str, file_name: str =CSV_FILE)-> None:
-   create_csv_file(file_name)
-   with open(file_name, mode="a", newline="") as file:
-      writer = csv.writer(file)
-      writer.writerow([data])
-
-
-def read_data() -> str:
-   if not os.path.isfile(CSV_FILE):
-      return ""
-   with open(CSV_FILE, mode="r") as file:
-      return file.read()
-
-
-def data_exists(data: str) -> bool: 
-   lines = read_data().splitlines()
-   for line in lines:
-      if line == data:
-         return True
-   return False
-
-
-def replace_data(data: str, new_data: str, file_name: str = CSV_FILE) -> None:
-   lines = read_data().splitlines()
-   updated_lines = []
-
-   for line in lines:
-      updated_line = line.strip()
-      if line.strip() == data:
-         updated_line = new_data.strip()
-      
-      if updated_line:
-         updated_lines.append(updated_line)
-
-   with open(file_name, mode='w') as file:
-      file.write("\n".join(updated_lines) + "\n")
-
+file_utils = FileUtils(CSV_FILE)
 
 @app.route("/insert_data", methods=['POST'])
 def insert_data():
    value = request.args.get('data')
    if not value:
       return Response("No data provided", status=400, mimetype="text/plain")
-   if data_exists(value):
+   if file_utils.data_exists(value):
       return Response("The value exsits in the db", status=409, mimetype="text/plain")
-   write_data(value)
+   file_utils.write_data(value)
    return Response("Value created at the db", status=201, mimetype="text/plain")
 
 
 @app.route("/get_info", methods=['GET'])
 def get_data():
-   if read_data() == "":
+   if file_utils.read_data() == "":
       return Response("No data found", status=400, mimetype="text/plain")
-   return Response(read_data(), status=200, mimetype="text/plain")
+   return Response(file_utils.read_data(), status=200, mimetype="text/plain")
 
 
 @app.route("/delete", methods=['DELETE'])
@@ -73,9 +31,9 @@ def delete_data():
    value = request.args.get('data')
    if not value:
       return Response("No data provided", status=400, mimetype="text/plain")
-   if not data_exists(value):
+   if not file_utils.data_exists(value):
       return Response("The value not exsits in the db", status=409, mimetype="text/plain")
-   replace_data(value, "")
+   file_utils.replace_data(value, "")
    return Response(f"Value {value} deleted from the db", status=200, mimetype="text/plain")
 
 
@@ -85,9 +43,11 @@ def update_data():
    new_value = request.args.get('new_data')
    if not value:
       return Response("No data provided", status=400, mimetype="text/plain")
-   if not data_exists(value):
-      return Response("The value not exsits in the db", status=409, mimetype="text/plain")
-   replace_data(value, new_value)
+   if not file_utils.data_exists(value):
+      return Response("The value to replace not exsits in the db", status=409, mimetype="text/plain")
+   elif file_utils.data_exists(new_value):
+      return Response("The new value exists in the db")
+   file_utils.replace_data(value, new_value)
    return Response(f"Value {value} updated by {new_value}", status=200, mimetype="text/plain")
 
 if __name__ == '__main__':
