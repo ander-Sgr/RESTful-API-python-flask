@@ -39,9 +39,13 @@ def replace_data(data: str, new_data: str, file_name: str = CSV_FILE) -> None:
    updated_lines = []
 
    for line in lines:
-      update_line = line.replace(data, new_data).strip()
-      if update_line:
-         updated_lines.append(update_line)
+      updated_line = line.strip()
+      if line.strip() == data:
+         updated_line = new_data.strip()
+      
+      if updated_line:
+         updated_lines.append(updated_line)
+
    with open(file_name, mode='w') as file:
       file.write("\n".join(updated_lines) + "\n")
 
