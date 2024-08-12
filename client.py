@@ -15,19 +15,29 @@ def parser_args(args: List) -> Namespace:
     parser.add_argument('--old_data', type=str, help="old data to replace")
     parser.add_argument('--new_data',type=str, help='new data for replace the old data')
     return parser.parse_args(args)
-
+    
 def insert_data(data: str):
-    params = {'data': data}
-    response = requests.post(f'{URL}insert_data', params=params)
-    print(f"Response status code: {response.status_code}")
-    print(f"Response content: {response.text}")
+    try:
+        headers = {'Content-Type': 'text/plain'}
+        data = {'data': data}
+        response = requests.post(f'{URL}insertdata', params=data, headers=headers)
+        response.raise_for_status()
+        print(f"Response status code: {response.status_code}")
+        print(f"Response content: {response.text}")
+    except requests.exceptions.HTTPError as http_err:
+        print(http_err.response.status_code)
+        print(http_err.response.text)
+    except requests.exceptions.RequestException as err:
+        print(f"An Error Ocurred: {err}")
+        
 
 def get_data():
-    response = requests.get(f"{URL}get_info")
+    response = requests.get(f"{URL}getdata")
     if response.ok:
         print(f"Response content: {response.text}")
-    elif response.status_code == 400:
-        print("Resource not found")
+    elif response.status_code == 404:
+        print("Resource not found\n")
+        print(f"Message from the server: {response.content}")
 
 def delete_data(data: str):
     params = {'data': data}
