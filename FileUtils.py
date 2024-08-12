@@ -13,7 +13,7 @@ class FileUtils:
             return file.read()
 
     def create_csv_file(self) -> None:
-        if not os.path.isfile(self.file_name):
+        #if not os.path.isfile(self.file_name):
             with open(self.file_name, mode="w", newline="") as file:
                 pass
 
