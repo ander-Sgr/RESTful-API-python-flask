@@ -73,3 +73,9 @@ Actualizar un dato existente en la DB.
 ```bash
 python client.py --update  --old_data <data antiguo> --new_data <nuevo data>
 ```
+
+## Ejecutar los tests
+
+```bash
+python -m pytest tests/
+```
